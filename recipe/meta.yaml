@@ -1,5 +1,5 @@
 {% set name = "dnspython" %}
-{% set version = "2.2.1" %}
+{% set version = "2.4.2" %}
 
 package:
   name: {{ name|lower }}
@@ -7,13 +7,12 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e
+  sha256: 8dcfae8c7460a2f84b4072e26f1c9f4101ca20c071649cb7c34e8b6a93d58984
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv
-  skip: True  # [py<36]
-  # trigger: 0
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
+  skip: True  # [py<38]
 
 requirements:
   host:
@@ -21,7 +20,7 @@ requirements:
     - pip
     - setuptools
     - wheel
-    - poetry
+    - poetry-core
   run:
     - python
     - idna >=2.1
@@ -40,13 +39,17 @@ test:
     - pip
 
 about:
-  home: http://www.dnspython.org
+  home: https://www.dnspython.org
   summary: DNS toolkit
+  description: |
+    dnspython is a DNS toolkit for Python. It supports almost all record types.
+    It can be used for queries, zone transfers, and dynamic updates. It supports
+    TSIG authenticated messages and EDNS0.
   license: ISC
   license_file: LICENSE
   license_family: OTHER
   dev_url: https://github.com/rthalley/dnspython
-  doc_url: http://www.dnspython.org
+  doc_url: https://dnspython.readthedocs.io/
 
 extra:
   recipe-maintainers:
