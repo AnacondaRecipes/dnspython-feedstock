@@ -1,28 +1,36 @@
 {% set name = "dnspython" %}
-{% set version = "2.4.2" %}
+{% set version = "2.8.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 8dcfae8c7460a2f84b4072e26f1c9f4101ca20c071649cb7c34e8b6a93d58984
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 181d3c6996452cb1189c4046c61599b84a5a86e099562ffde77d26984ff26d0f
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
-  skip: True  # [py<38]
+  skip: true  # [py<310]
 
 requirements:
   host:
     - python
     - pip
-    - poetry-core
+    - hatchling >=1.21.0
   run:
     - python
     - idna >=2.1
     - cryptography >=2.6
+  run_constrained:
+    - cryptography >=45
+    - httpcore >=1.0.0
+    - httpx >=0.28.0
+    - h2 >=4.2.0
+    - aioquic >=1.2.0
+    - idna >=3.10
+    - trio >=0.30
 
 test:
   imports:
