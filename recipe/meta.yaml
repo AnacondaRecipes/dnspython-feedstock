@@ -1,30 +1,55 @@
 {% set name = "dnspython" %}
-{% set version = "2.4.2" %}
+{% set version = "2.8.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 8dcfae8c7460a2f84b4072e26f1c9f4101ca20c071649cb7c34e8b6a93d58984
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 181d3c6996452cb1189c4046c61599b84a5a86e099562ffde77d26984ff26d0f
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
-  skip: True  # [py<38]
+  skip: True  # [py<310]
 
 requirements:
   host:
     - python
     - pip
-    - poetry-core
+    - hatchling >=1.21.0
   run:
     - python
-    - idna >=2.1
-    - cryptography >=2.6
+  run_constrained:
+    # dnssec
+    - cryptography >=45
+    # doh
+    - httpcore >=1.0.0
+    - httpx >=0.28.0
+    - h2 >=4.2.0
+    # doq
+    - aioquic >=1.2.0
+    # idna
+    - idna >=3.10
+    # trio
+    - trio >=0.30
+    # wmi
+    - wmi >=1.5.1  # [win]
 
+# https://github.com/rthalley/dnspython/issues/1136 -> upstream maintaner won`t fix that:
+# rthalley comment:
+# I agree it's suboptimal that there are live tests at all, and that they can be flaky in some environments.
+# >   self.assertEqual(dns.resolver.canonical_name(name), cname)
+# E   AssertionError: <DNS name dangling-cname.dnspython.org.> != <DNS name dangling-target.dnspython.org.>
+{% set deselect_tests = " --deselect=tests/test_async.py::AsyncTests::testCanonicalNameDangling" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_ddr.py::test_basic_ddr_sync" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_ddr.py::test_basic_ddr_async" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_resolver.py::LiveResolverTests::testCanonicalNameDangling" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_resolver_override.py::OverrideSystemResolverTestCase::test_basic_getaddrinfo" %}
 test:
+  source_files:
+    - tests
   imports:
     - dns
     - dns.rdtypes
@@ -33,8 +58,10 @@ test:
     - dns.rdtypes.CH
   commands:
     - pip check
+    - pytest -v tests {{ deselect_tests }}
   requires:
     - pip
+    - pytest
 
 about:
   home: https://www.dnspython.org
@@ -47,7 +74,7 @@ about:
   license_file: LICENSE
   license_family: OTHER
   dev_url: https://github.com/rthalley/dnspython
-  doc_url: https://dnspython.readthedocs.io/
+  doc_url: https://dnspython.readthedocs.io
 
 extra:
   recipe-maintainers:
