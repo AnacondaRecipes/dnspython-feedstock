@@ -59,6 +59,7 @@ test:
     - pip check
     - pytest -v tests {{ deselect_tests }}
   requires:
+    - idna >=3.20
     - pip
     - pytest >=9.1
 
