@@ -38,7 +38,6 @@ requirements:
     - wmi >=1.5.1  # [win]
 
 # https://github.com/rthalley/dnspython/issues/1136 -> upstream maintaner won`t fix that:
-# rthalley comment:
 # I agree it's suboptimal that there are live tests at all, and that they can be flaky in some environments.
 # >   self.assertEqual(dns.resolver.canonical_name(name), cname)
 # E   AssertionError: <DNS name dangling-cname.dnspython.org.> != <DNS name dangling-target.dnspython.org.>
