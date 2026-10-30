@@ -1,44 +1,43 @@
 {% set name = "dnspython" %}
-{% set version = "2.8.0" %}
+{% set version = "2.9.1" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 181d3c6996452cb1189c4046c61599b84a5a86e099562ffde77d26984ff26d0f
+  sha256: 9a6d30e55f8dc63e6052597666112bff0586b95a2474a9deda03afbbf820d37a
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
-  skip: True  # [py<310]
+  skip: true  # [py<311]
 
 requirements:
   host:
     - python
     - pip
-    - hatchling >=1.21.0
+    - uv-build >=0.9.21,<0.14.0
   run:
     - python
   run_constrained:
     # dnssec
-    - cryptography >=45
+    - cryptography >=50
     # doh
-    - httpcore >=1.0.0
-    - httpx >=0.28.0
-    - h2 >=4.2.0
+    - httpcore2 >=2.13
+    - httpx2 >=2.13
+    - h2 >=4.4
     # doq
-    - aioquic >=1.2.0
+    - aioquic >=1.3.0
     # idna
-    - idna >=3.10
+    - idna >=3.20
     # trio
-    - trio >=0.30
+    - trio >=0.34
     # wmi
     - wmi >=1.5.1  # [win]
 
 # https://github.com/rthalley/dnspython/issues/1136 -> upstream maintaner won`t fix that:
-# rthalley comment:
 # I agree it's suboptimal that there are live tests at all, and that they can be flaky in some environments.
 # >   self.assertEqual(dns.resolver.canonical_name(name), cname)
 # E   AssertionError: <DNS name dangling-cname.dnspython.org.> != <DNS name dangling-target.dnspython.org.>
@@ -60,8 +59,9 @@ test:
     - pip check
     - pytest -v tests {{ deselect_tests }}
   requires:
+    - idna >=3.20
     - pip
-    - pytest
+    - pytest >=9.1
 
 about:
   home: https://www.dnspython.org
